@@ -656,37 +656,7 @@ endef
 
 $(eval $(call KernelPackage,phy-airoha-en8811h))
 
-define KernelPackage/airoha-npu
-  SUBMENU:=$(NETWORK_DEVICES_MENU)
-  TITLE:=Airoha EN7581 NPU support
-  DEPENDS:=@TARGET_airoha_an7581 +airoha-en7581-npu-firmware
-  KCONFIG:=CONFIG_NET_AIROHA_NPU
-  FILES:=$(LINUX_DIR)/drivers/net/ethernet/airoha/airoha_npu.ko
-  AUTOLOAD:=$(call AutoLoad,40,airoha_npu,1)
-endef
 
-define KernelPackage/airoha-npu/description
-  Kernel module support for the Airoha EN7581 Network Processor Unit (NPU)
-endef
-
-$(eval $(call KernelPackage,airoha-npu))
-
-define KernelPackage/airoha-eth
-  SUBMENU:=$(NETWORK_DEVICES_MENU)
-  TITLE:=Airoha SoC Ethernet support
-  DEPENDS:=@TARGET_airoha_an7581 +kmod-airoha-npu +kmod-of-mdio
-  KCONFIG:= \
-	CONFIG_NET_VENDOR_AIROHA \
-	CONFIG_NET_AIROHA
-  FILES:=$(LINUX_DIR)/drivers/net/ethernet/airoha/airoha-eth.ko
-  AUTOLOAD:=$(call AutoLoad,41,airoha-eth,1)
-endef
-
-define KernelPackage/airoha-eth/description
-  Kernel module support for the Airoha SoC Ethernet controller
-endef
-
-$(eval $(call KernelPackage,airoha-eth))
 
 
 
