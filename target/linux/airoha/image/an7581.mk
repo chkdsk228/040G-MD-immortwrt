@@ -149,7 +149,7 @@ define Device/nokia_xg-040g-md-common
   DEVICE_MODEL := XG-040G-MD
   BLOCKSIZE := 128k
   PAGESIZE := 2048
-  UBINIZE_OPTS := -E 5
+  UBINIZE_OPTS := -s 2048
   DEVICE_PACKAGES := kmod-gpio-button-hotplug kmod-leds-gpio \
 	kmod-phy-airoha-en8811h kmod-regulator-userspace-consumer \
 	kmod-usb-ledtrig-usbport kmod-usb3
@@ -159,7 +159,9 @@ define Device/nokia_xg-040g-md
   $(call Device/nokia_xg-040g-md-common)
   DEVICE_DTS := an7581-nokia_xg-040g-md
   DEVICE_DTS_CONFIG := config@1
-  IMAGE_SIZE := 131968k
+  SOC := an7581
+  KERNEL_LOADADDR := 0x80088000
+  IMAGE_SIZE := 261120k
   KERNEL_SIZE := 8192k
   IMAGES += factory-kernel.bin factory-rootfs.bin
   IMAGE/factory-kernel.bin := append-kernel
@@ -172,6 +174,9 @@ define Device/nokia_xg-040g-md-ubi
   $(call Device/nokia_xg-040g-md-common)
   DEVICE_VARIANT := (UBI)
   DEVICE_DTS := an7581-nokia_xg-040g-md-ubi
+  SUPPORTED_DEVICES += nokia,xg-040g-md
+  SOC := an7581
+  KERNEL_LOADADDR := 0x80088000
   UBOOTENV_IN_UBI := 1
   KERNEL_IN_UBI := 1
   KERNEL := kernel-bin | gzip
@@ -200,7 +205,9 @@ define Device/nokia_xg-040g-tf
   $(call Device/nokia_xg-040g-tf-common)
   DEVICE_DTS := an7581-nokia_xg-040g-tf
   DEVICE_DTS_CONFIG := config@1
-  IMAGE_SIZE := 131968k
+  SOC := an7581
+  KERNEL_LOADADDR := 0x80088000
+  IMAGE_SIZE := 261120k
   KERNEL_SIZE := 8192k
   IMAGES += factory-kernel.bin factory-rootfs.bin
   IMAGE/factory-kernel.bin := append-kernel
@@ -213,6 +220,9 @@ define Device/nokia_xg-040g-tf-ubi
   $(call Device/nokia_xg-040g-tf-common)
   DEVICE_VARIANT := (UBI)
   DEVICE_DTS := an7581-nokia_xg-040g-tf-ubi
+  SUPPORTED_DEVICES += nokia,xg-040g-tf
+  SOC := an7581
+  KERNEL_LOADADDR := 0x80088000
   UBOOTENV_IN_UBI := 1
   KERNEL_IN_UBI := 1
   KERNEL := kernel-bin | gzip
