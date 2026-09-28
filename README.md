@@ -122,11 +122,32 @@
 ## 下载
 
 - [Releases 页面](https://github.com/chkdsk228/040G-MD-immortwrt/releases)
-- XG-040G-MD 标准版：`immortalwrt-YYYYMMDD-<repo-hash>-airoha-an7581-nokia_xg-040g-md-*`
-- XG-040G-MD UBI 版：`immortalwrt-YYYYMMDD-<repo-hash>-airoha-an7581-nokia_xg-040g-md-ubi-*`
-- XG-040G-TF 标准版：`immortalwrt-YYYYMMDD-<repo-hash>-airoha-an7581-nokia_xg-040g-tf-*`
-- XG-040G-TF UBI 版：`immortalwrt-YYYYMMDD-<repo-hash>-airoha-an7581-nokia_xg-040g-tf-ubi-*`
-- 升级方法：LuCI → 系统 → 备份/升级 → 刷写固件
+## 固件文件说明
+
+各设备版本对应的产物文件与升级方式不同，请按下表选择：
+
+| 设备版本 | 固件文件 | 升级方式 |
+|----------|----------|----------|
+| **XG-040G-MD / XG-040G-TF（标准版）** | `...-nokia_xg-040g-md/tf-*`（含 `sysupgrade.bin`） | **LuCI → 系统 → 备份/升级 → 选择 `sysupgrade.bin` 刷写** |
+| **XG-040G-MD-UBI / XG-040G-TF-UBI（UBI 版）** | `...-nokia_xg-040g-md-ubi/tf-ubi-*`（含 `sysupgrade.itb`、`recovery.itb`） | 详见下方 UBI 版升级说明 |
+
+### 标准版升级
+
+- 文件：`sysupgrade.bin`
+- 方法：**LuCI → 系统 → 备份/升级 → 刷写固件**（常规 OpenWrt 升级流程）
+
+### UBI 版升级
+
+UBI 版采用**整盘 UBI 布局**（`KERNEL_IN_UBI` 与 `UBOOTENV_IN_UBI` 均在 UBI 卷内），**内核与 rootfs 打包为 FIT 格式 `sysupgrade.itb`**，不能直接用标准版的 LuCI sysupgrade.bin 流程：
+
+- 文件：`sysupgrade.itb`（FIT 格式，含内核 + rootfs）
+- Recovery 镜像：`...-recovery.itb`（initramfs + dtb，U-Boot 应急恢复用）
+- 升级方法（二选一）：
+  1. **LuCI → 系统 → 备份/升级 → 选择 `sysupgrade.itb` 刷写**（FIT 镜像，需要当前系统已是 OpenWrt UBI 布局）
+  2. **U-Boot HTTP Recovery**：设备进入 U-Boot 的 HTTP 恢复模式后，通过 `luci-app-airoha-recovery` 一键重启进入，再上传 `sysupgrade.itb`
+
+> [!NOTE]
+> UBI 版固件还包含额外的引导产物：`bl31-uboot.fip` 与 `preloader.bin`（位于 Release 附件的 ARTIFACTS 中），用于配套 U-Boot 引导，仅在更换引导程序时需要，常规升级**不要刷写**这两个文件。
 
 ### 升级注意事项
 
