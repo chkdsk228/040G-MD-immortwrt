@@ -19,6 +19,7 @@
 
 - **XG-040G-MD**：标准 NAND 布局版
 - **XG-040G-MD (UBI)**：UBI 布局版
+- **XG-040G-TF**：标准 NAND 布局版
 - **XG-040G-TF (UBI)**：TF 面板版（设备树借用于 ponwrt）
 
 ## 支持设备
@@ -27,11 +28,12 @@
 |------|----------|----------|------------|
 | Nokia XG-040G-MD（标准 NAND） | [`040g.config`](040g.config) | 标准固件 | [`an7581-nokia_xg-040g-md.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-md.dts) |
 | Nokia XG-040G-MD（OpenWrt U-Boot UBI 布局） | [`040g.config`](040g.config) | 整盘 UBI 引导方案 | [`an7581-nokia_xg-040g-md-ubi.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-md-ubi.dts) |
-| Nokia XG-040G-TF（UBI 布局，TF 面板） | [`040g.config`](040g.config) | TF 面板版本（借用于 [pbs05/ponwrt](https://github.com/pbs05/ponwrt)） | [`an7581-nokia_xg-040g-tf-ubi.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-tf-ubi.dts) |
+| Nokia XG-040G-TF（标准 NAND） | [`040g.config`](040g.config) | TF 面板标准版 | [`an7581-nokia_xg-040g-tf.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-tf.dts) |
+| Nokia XG-040G-TF（UBI 布局，TF 面板） | [`040g.config`](040g.config) | TF 面板 UBI 版（借用于 [pbs05/ponwrt](https://github.com/pbs05/ponwrt)） | [`an7581-nokia_xg-040g-tf-ubi.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-tf-ubi.dts) |
 
 ### XG-040G-MD
 
-默认管理地址：http://192.168.1.1 或 http://immortalwrt.lan，用户名：**root**，密码：*无*。
+默认管理地址：http://192.168.50.1 或 http://immortalwrt.lan，用户名：**root**，密码：*无*。
 
 | 项目 | 参数 |
 |------|------|
@@ -57,7 +59,7 @@
   - `lan1`（gdm4）+ `lan2`（gsw_port2）→ `br-lan`（LAN）
   - `lan3`（gsw_port3）→ `wan2`
   - `lan4`（gsw_port4）→ `wan`
-- 默认 LAN 地址为 `192.168.1.1`。
+- 默认 LAN 地址为 `192.168.50.1`（naoki66 默认）。
 - 默认启用 firewall4（nftables）软件 flow offload。
 
 ### 预装 LuCI 应用
@@ -83,7 +85,7 @@
 | [build-firmware.yml](.github/workflows/build-firmware.yml) | 手动 (workflow_dispatch) | 构建固件并发布 Release |
 | [sync-upstream.yml](.github/workflows/sync-upstream.yml) | 每 3 天定时 + 手动 | 同步 ImmortalWrt 上游 |
 
-**构建配置**：仓库根目录的 [040g.config](040g.config) 对应 XG-040G 系列（默认）。`040g.config` 使用 multi-profile 一次构建 MD / MD-UBI / TF-UBI 三份固件；Action 默认使用 `040g.config`，也可以在手动触发时选择 `1710.config` 或 `2010.config`（保留 naoki66 原设备）。
+**构建配置**：仓库根目录的 [040g.config](040g.config) 对应 XG-040G 系列（默认）。`040g.config` 使用 multi-profile 一次构建 MD / MD-UBI / TF / TF-UBI 四份固件；Action 默认使用 `040g.config`，也可以在手动触发时选择 `1710.config` 或 `2010.config`（保留 naoki66 原设备）。
 构建流程会执行 `cp <config> .config && bash scripts/set-build-version.sh .config && make defconfig`。
 
 **Release 格式**：
@@ -96,6 +98,7 @@
 - [Releases 页面](https://github.com/chkdsk228/040G-MD-immortwrt/releases)
 - XG-040G-MD 标准版：`immortalwrt-YYYYMMDD-<repo-hash>-airoha-an7581-nokia_xg-040g-md-*`
 - XG-040G-MD UBI 版：`immortalwrt-YYYYMMDD-<repo-hash>-airoha-an7581-nokia_xg-040g-md-ubi-*`
+- XG-040G-TF 标准版：`immortalwrt-YYYYMMDD-<repo-hash>-airoha-an7581-nokia_xg-040g-tf-*`
 - XG-040G-TF UBI 版：`immortalwrt-YYYYMMDD-<repo-hash>-airoha-an7581-nokia_xg-040g-tf-ubi-*`
 - 升级方法：LuCI → 系统 → 备份/升级 → 刷写固件
 
