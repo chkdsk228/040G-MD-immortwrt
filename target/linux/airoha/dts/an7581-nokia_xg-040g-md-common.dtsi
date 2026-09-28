@@ -313,3 +313,9 @@
 		#trigger-source-cells = <0>;
 	};
 };
+
+/* NPU firmware: use the MT7996 variant shipped by airoha-en7581-npu-firmware */
+&npu {
+	firmware-name = "airoha/en7581_MT7996_npu_rv32.bin",
+		       "airoha/en7581_MT7996_npu_data.bin";
+};
