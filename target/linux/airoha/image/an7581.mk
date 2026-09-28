@@ -170,6 +170,25 @@ define Device/nokia_xg-040g-md
 endef
 TARGET_DEVICES += nokia_xg-040g-md
 
+define Device/nokia_xg-040g-md-tcboot
+  $(call Device/nokia_xg-040g-md-common)
+  DEVICE_VARIANT := (tcboot)
+  DEVICE_DTS := an7581-nokia_xg-040g-md-tcboot
+  SUPPORTED_DEVICES += bell,xg-040g-md
+  SOC := an7581
+  KERNEL_LOADADDR := 0x80088000
+  KERNEL_SIZE := 8192k
+  IMAGE_SIZE := 261120k
+  KERNEL_IN_UBI := 1
+  UBINIZE_OPTS := -s 2048
+  IMAGES := factory.bin sysupgrade.bin
+  IMAGE/factory.bin := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_PACKAGES += airoha-en7581-npu-firmware kmod-i2c-an7581 \
+	uboot-envtools ubi-utils
+endef
+TARGET_DEVICES += nokia_xg-040g-md-tcboot
+
 define Device/nokia_xg-040g-md-ubi
   $(call Device/nokia_xg-040g-md-common)
   DEVICE_VARIANT := (UBI)
