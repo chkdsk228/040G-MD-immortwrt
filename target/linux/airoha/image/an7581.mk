@@ -149,7 +149,7 @@ define Device/nokia_xg-040g-md-common
   DEVICE_MODEL := XG-040G-MD
   BLOCKSIZE := 128k
   PAGESIZE := 2048
-  UBINIZE_OPTS := -s 2048
+  UBINIZE_OPTS := -E 5
   DEVICE_PACKAGES := kmod-gpio-button-hotplug kmod-leds-gpio \
 	kmod-phy-airoha-en8811h kmod-regulator-userspace-consumer \
 	kmod-usb-ledtrig-usbport kmod-usb3
@@ -196,6 +196,7 @@ define Device/nokia_xg-040g-md-ubi
   SUPPORTED_DEVICES += nokia,xg-040g-md
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
+  UBINIZE_OPTS := -s 2048
   UBOOTENV_IN_UBI := 1
   KERNEL_IN_UBI := 1
   KERNEL := kernel-bin | gzip
@@ -242,6 +243,7 @@ define Device/nokia_xg-040g-tf-ubi
   SUPPORTED_DEVICES += nokia,xg-040g-tf
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
+  UBINIZE_OPTS := -s 2048
   UBOOTENV_IN_UBI := 1
   KERNEL_IN_UBI := 1
   KERNEL := kernel-bin | gzip
