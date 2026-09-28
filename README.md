@@ -76,6 +76,7 @@
 
 | 应用 | 功能 |
 |------|------|
+| `luci-app-airoha` | SoC/NPU 状态与加速开关、FlowSense（本仓库合并） |
 | `luci-app-airoha-factory` | 设备分区/工厂数据管理（本仓库） |
 | `luci-app-airoha-recovery` | U-Boot HTTP Recovery 一键进入（本仓库） |
 | `luci-app-argon-config` | Argon 主题配置 |
@@ -102,7 +103,7 @@
 | `luci-app-homeproxy` | 科学上网（代理分流） |
 | `luci-app-lucky` | Lucky（DDNS/反代/端口转发）· 来源 [sirpdboy/luci-app-lucky](https://github.com/sirpdboy/luci-app-lucky) |
 
-> 注：本配置为无风扇光猫（XG-040G），未启用 `luci-app-airoha-fancontrol`、`luci-app-airoha`（NPU 界面）、`luci-app-openclash`、`luci-app-mwan3`、`luci-app-samba4`、`luci-app-wolplus`；如需请自行在 040g.config 中启用。
+> 注：本配置为无风扇光猫（XG-040G），未启用 `luci-app-airoha-fancontrol`、`luci-app-openclash`、`luci-app-mwan3`、`luci-app-samba4`、`luci-app-wolplus`；如需请自行在 040g.config 中启用。
 
 ## GitHub Actions 工作流
 
