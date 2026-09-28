@@ -87,7 +87,7 @@ elif grep -Eq '^CONFIG_(TARGET_airoha_an7581_DEVICE|TARGET_DEVICE_airoha_an7581_
 	)
 	manifest_required_packages=("${required_packages[@]}")
 	forbidden_kernel='CONFIG_MT(76|7996).*=(y|m)'
-	required_kernel='CONFIG_PTP_1588_CLOCK_AIROHA_TOD=m'
+	required_kernel=''
 else
 	echo "unsupported Gemtek profile in $config_file" >&2
 	exit 1
