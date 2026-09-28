@@ -47,11 +47,12 @@
 ### 核心定制
 
 - 基于 [naoki66/ImmortalWrt-for-Gemtek-brightspeed](https://github.com/naoki66/ImmortalWrt-for-Gemtek-brightspeed) 的设备树与内核补丁体系（`target/linux/airoha/patches-6.18/`）。
-- 启用 Nokia XG-040G-MD / MD-UBI / TF-UBI 三个设备 profile（`040g.config` 使用 multi-profile 一次构建多份固件）。
+- 启用 Nokia XG-040G-MD / MD-UBI / TF / TF-UBI 四个设备 profile（`040g.config` 使用 multi-profile 一次构建多份固件）。
 - TF 面板设备树 `an7581-nokia_xg-040g-tf-*.dts*` 借用于 [pbs05/ponwrt](https://github.com/pbs05/ponwrt)。
-- PON 支持：`CONFIG_AIROHA_PON_COMPAT=y`，驱动与用户态来自 [pbs05/openwrt-pon-drivers](https://github.com/pbs05/openwrt-pon-drivers) 与 [pbs05/openwrt-pon-userspace](https://github.com/pbs05/openwrt-pon-userspace)（`kmod-airoha-en7572`、`kmod-airoha-pon-frontend`、`kmod-airoha-xpon`、`luci-app-pon`）。
+- PON 支持：`CONFIG_AIROHA_PON_COMPAT=y`，驱动与用户态来自 [pbs05/openwrt-pon-drivers](https://github.com/pbs05/openwrt-pon-drivers) 与 [pbs05/openwrt-pon-userspace](https://github.com/pbs05/openwrt-pon-userspace)（`kmod-airoha-en7572`、`kmod-airoha-pon-frontend`、`kmod-airoha-xpon`、`kmod-airoha-tod`、`kmod-airoha-en7581-pcm-spi`、`airoha-ponctl`、`airoha-pond`、`luci-app-pon`）。
 - CPUFreq/PM 域：`CONFIG_KERNEL_ARM_AIROHA_SOC_CPUFREQ`、`CONFIG_KERNEL_AIROHA_CPU_PM_DOMAIN`、`CONFIG_KERNEL_CPUFREQ_DT`。
 - 内核配置导出：`CONFIG_KERNEL_IKCONFIG` / `_PROC`。
+- 固件：`airoha-en7581-npu-firmware`、`airoha-en8811h-firmware`。
 
 ### 网络与默认行为
 
@@ -66,17 +67,44 @@
 
 | 应用 | 来源 | 功能 |
 |------|------|------|
-| `luci-app-airoha` | 本仓库合并（继承 naoki66） | SoC/NPU 状态与加速开关、FlowSense |
-| `luci-app-airoha-fancontrol` | 继承 naoki66 | 风扇速度/温度控制 |
-| `luci-app-pon` | [pbs05/openwrt-pon-userspace](https://github.com/pbs05/openwrt-pon-userspace) | PON 管理界面 |
-| `luci-app-iptv` | [pbs05/openwrt-pon-userspace](https://github.com/pbs05/openwrt-pon-userspace) | IPTV 组播 |
-| `luci-app-openclash` | 社区 | 科学上网 |
+#### PON 相关
+
+| 应用 | 来源 | 功能 |
+|------|------|------|
+| `luci-app-pon` | [pbs05/openwrt-pon-userspace](https://github.com/pbs05/openwrt-pon-userspace) | PON 管理界面（光链路状态/配置） |
+| `luci-app-iptv` | [pbs05/openwrt-pon-userspace](https://github.com/pbs05/openwrt-pon-userspace) | IPTV 组播/RTP |
+
+#### 系统与自动化
+
+| 应用 | 功能 |
+|------|------|
+| `luci-app-airoha-factory` | 设备分区/工厂数据管理（本仓库） |
+| `luci-app-airoha-recovery` | U-Boot HTTP Recovery 一键进入（本仓库） |
+| `luci-app-argon-config` | Argon 主题配置 |
+| `luci-app-arpbind` | IP/MAC 绑定 |
+| `luci-app-autoreboot` | 定时重启 |
+| `luci-app-ddns` | 传统 DDNS 脚本 |
+| `luci-app-ddns-go` | DDNS-Go 动态域名（阿里云/Cloudflare/DNSPod） |
+| `luci-app-firewall` | 防火墙（firewall4/nftables） |
+| `luci-app-msd_lite` | MSD Lite 组播播放 |
+| `luci-app-timewol` | 定时网络唤醒 |
+| `luci-app-ttyd` | Web 终端 |
+| `luci-app-udpxy` | UDP 组播代理 |
+| `luci-app-upnp` | UPnP 自动端口转发 |
+| `luci-app-vlmcsd` | KMS 激活服务 |
+| `luci-app-watchcat` | 网络看门狗 |
+| `luci-app-wechatpush` | 微信推送通知 |
+| `luci-app-wol` | 网络唤醒 |
+| `luci-app-zerotier` | ZeroTier 虚拟局域网 |
+
+#### 网络工具
+
+| 应用 | 功能 |
+|------|------|
+| `luci-app-homeproxy` | 科学上网（代理分流） |
 | `luci-app-lucky` | [sirpdboy/luci-app-lucky](https://github.com/sirpdboy/luci-app-lucky) | Lucky（DDNS/反代/端口转发） |
-| `luci-app-mwan3` | 社区 | 多 WAN 负载均衡 |
-| `luci-app-autoreboot` | 社区 | 定时重启 |
-| `luci-app-samba4` | 社区 | SMB 共享 |
-| `luci-app-upnp` | 社区 | UPnP 自动端口转发 |
-| `luci-app-wolplus` | 社区 | 网络唤醒 |
+
+> 注：本配置为无风扇光猫（XG-040G），未启用 `luci-app-airoha-fancontrol`、`luci-app-airoha`（NPU 界面）、`luci-app-openclash`、`luci-app-mwan3`、`luci-app-samba4`、`luci-app-wolplus`；如需请自行在 040g.config 中启用。
 
 ## GitHub Actions 工作流
 
