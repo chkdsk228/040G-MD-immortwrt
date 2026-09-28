@@ -76,6 +76,18 @@ elif grep -Eq '^CONFIG_(TARGET_airoha_an7581_DEVICE|TARGET_DEVICE_airoha_an7581_
 	manifest_required_packages=("${required_packages[@]}" kmod-airoha-tod)
 	forbidden_kernel='CONFIG_MT(76|7996).*=(y|m)'
 	required_kernel='CONFIG_PTP_1588_CLOCK_AIROHA_TOD=m'
+elif grep -Eq '^CONFIG_(TARGET_airoha_an7581_DEVICE|TARGET_DEVICE_airoha_an7581_DEVICE)_nokia_xg-040g-(md|md-ubi|tf|tf-ubi)=y$' "$config_file"; then
+	profile="xg040g"
+	forbidden_packages='(airoha-an7581-mt7996-board|airoha-en7581-mt7996-npu-firmware|hostapd.*|iw|iw-full|iwinfo|kmod-(mac80211.*|mt76.*|mt7996.*)|ucode-mod-nl80211|wireless-regdb|wpad.*)'
+	required_packages=(
+		kmod-airoha-en7572
+		kmod-airoha-xpon
+		airoha-ponctl
+		luci-app-pon
+	)
+	manifest_required_packages=("${required_packages[@]}")
+	forbidden_kernel='CONFIG_MT(76|7996).*=(y|m)'
+	required_kernel='CONFIG_PTP_1588_CLOCK_AIROHA_TOD=m'
 else
 	echo "unsupported Gemtek profile in $config_file" >&2
 	exit 1
