@@ -51,6 +51,7 @@ an7581_setup_interfaces()
 		;;
 	nokia,xg-040g-md |\
 	nokia,xg-040g-md-ubi |\
+	nokia,xg-040g-tf |\
 	nokia,xg-040g-tf-ubi)
 		# 双 WAN 布局: lan1+lan2 -> br-lan(LAN), lan3 -> wan2, lan4 -> wan
 		ucidef_set_interface_lan "lan1 lan2"
