@@ -6,9 +6,10 @@ on:
       config_seed:
         description: 'Build config'
         required: true
-        default: '1710.config'
+        default: '040g.config'
         type: choice
         options:
+          - 040g.config
           - 1710.config
           - 2010.config
       release_type:
@@ -61,6 +62,7 @@ jobs:
           echo "version_number=$version_number" >> $GITHUB_OUTPUT
           echo "version_code=$version_code" >> $GITHUB_OUTPUT
           case '${{ inputs.config_seed }}' in
+            040g.config) device_model=XG-040G ;;
             1710.config) device_model=XR1710G ;;
             2010.config) device_model=XG2010G ;;
             *) echo "Unsupported config seed: ${{ inputs.config_seed }}" >&2; exit 1 ;;
