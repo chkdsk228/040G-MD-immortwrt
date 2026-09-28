@@ -196,6 +196,19 @@ define Device/nokia_xg-040g-tf-common
 	-kmod-usb-ledtrig-usbport -kmod-usb3
 endef
 
+define Device/nokia_xg-040g-tf
+  $(call Device/nokia_xg-040g-tf-common)
+  DEVICE_DTS := an7581-nokia_xg-040g-tf
+  DEVICE_DTS_CONFIG := config@1
+  IMAGE_SIZE := 131968k
+  KERNEL_SIZE := 8192k
+  IMAGES += factory-kernel.bin factory-rootfs.bin
+  IMAGE/factory-kernel.bin := append-kernel
+  IMAGE/factory-rootfs.bin := append-ubi | check-size
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += nokia_xg-040g-tf
+
 define Device/nokia_xg-040g-tf-ubi
   $(call Device/nokia_xg-040g-tf-common)
   DEVICE_VARIANT := (UBI)
