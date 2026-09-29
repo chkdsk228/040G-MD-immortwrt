@@ -109,17 +109,34 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          failed_pkg=$(grep 'ERROR:.*failed to build' build.log | head -1 | sed 's/.*ERROR: \(.*\) failed to build.*/\1/' || true)
+          failed_pkg=$(grep 'ERROR:.*failed to build' build.log | head -1 | sed -E 's/.*ERROR: ([^ ]+) failed to build.*/\1/' || true)
           if [ -n "$failed_pkg" ]; then
             echo "=== Rebuilding $failed_pkg with V=s ==="
-            make "package/$failed_pkg/compile" V=s -j1 2>&1 | tee build-verbose.log || true
+            case "$failed_pkg" in
+              target/*)
+                # target-level failure (e.g. target/linux): run that tree's install target verbosely
+                make "$failed_pkg/install" V=s -j1 2>&1 | tee build-verbose.log || true
+                ;;
+              package/*)
+                # already fully qualified package path
+                make "$failed_pkg/compile" V=s -j1 2>&1 | tee build-verbose.log || true
+                ;;
+              *)
+                # feed or bare package name
+                make "package/$failed_pkg/compile" V=s -j1 2>&1 | tee build-verbose.log || true
+                ;;
+            esac
             echo "=== First errors in build-verbose.log ==="
             grep -nE "error:|Error [0-9]|FAILED|Patch failed|No rule to make target" build-verbose.log | head -40 || true
             echo "=== tail of build-verbose.log ==="
             tail -80 build-verbose.log || true
           else
-            echo "No failing package found in build.log" >&2
-            tail -150 build.log || true
+            echo "No failing package found in build.log - running verbose world build"
+            make V=s -j1 world 2>&1 | tee build-verbose.log || true
+            echo "=== First errors in build-verbose.log ==="
+            grep -nE "error:|Error [0-9]|FAILED|Patch failed|No rule to make target" build-verbose.log | head -40 || true
+            echo "=== tail of build-verbose.log ==="
+            tail -150 build-verbose.log || true
           fi
 
       - name: Verify device isolation
