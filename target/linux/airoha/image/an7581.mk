@@ -144,12 +144,15 @@ endef
 TARGET_DEVICES += nokia_valyrian
 
 define Device/nokia_xg-040g-md-common
-  $(call Device/FitImageLzma)
   DEVICE_VENDOR := Nokia
   DEVICE_MODEL := XG-040G-MD
   BLOCKSIZE := 128k
   PAGESIZE := 2048
   UBINIZE_OPTS := -E 5
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 128k
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
   DEVICE_PACKAGES := kmod-gpio-button-hotplug kmod-leds-gpio \
 	kmod-phy-airoha-en8811h kmod-regulator-userspace-consumer \
 	kmod-usb-ledtrig-usbport kmod-usb3
@@ -163,9 +166,12 @@ define Device/nokia_xg-040g-md
   KERNEL_LOADADDR := 0x80088000
   IMAGE_SIZE := 261120k
   KERNEL_SIZE := 8192k
-  IMAGES += factory-kernel.bin factory-rootfs.bin
+  IMAGES += factory-kernel.bin factory-rootfs.bin sysupgrade.itb
   IMAGE/factory-kernel.bin := append-kernel
   IMAGE/factory-rootfs.bin := append-ubi | check-size
+  IMAGE/sysupgrade.itb := append-kernel | \
+	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
+	append-metadata
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
 TARGET_DEVICES += nokia_xg-040g-md
@@ -181,9 +187,12 @@ define Device/nokia_xg-040g-md-tcboot
   IMAGE_SIZE := 261120k
   KERNEL_IN_UBI := 1
   UBINIZE_OPTS := -s 2048
-  IMAGES := factory.bin sysupgrade.bin
+  IMAGES := factory.bin sysupgrade.bin sysupgrade.itb
   IMAGE/factory.bin := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  IMAGE/sysupgrade.itb := append-kernel | \
+	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
+	append-metadata
   DEVICE_PACKAGES += airoha-en7581-npu-firmware kmod-i2c-an7581 \
 	uboot-envtools ubi-utils
 endef
@@ -229,9 +238,12 @@ define Device/nokia_xg-040g-tf
   KERNEL_LOADADDR := 0x80088000
   IMAGE_SIZE := 261120k
   KERNEL_SIZE := 8192k
-  IMAGES += factory-kernel.bin factory-rootfs.bin
+  IMAGES += factory-kernel.bin factory-rootfs.bin sysupgrade.itb
   IMAGE/factory-kernel.bin := append-kernel
   IMAGE/factory-rootfs.bin := append-ubi | check-size
+  IMAGE/sysupgrade.itb := append-kernel | \
+	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
+	append-metadata
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
 TARGET_DEVICES += nokia_xg-040g-tf
