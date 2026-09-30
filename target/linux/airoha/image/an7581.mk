@@ -161,11 +161,10 @@ define Device/nokia_xg-040g-md-images
   KERNEL_INITRAMFS := kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(DEVICE_DTS).dtb with-initrd | pad-to 128k
   KERNEL_INITRAMFS_SUFFIX := -recovery.itb
-  IMAGES := sysupgrade.itb sysupgrade.bin
+  IMAGES := sysupgrade.itb
   IMAGE/sysupgrade.itb := append-kernel | \
 	fit gzip $$(KDIR)/image-$$(DEVICE_DTS).dtb external-static-with-rootfs | \
 	append-metadata
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   DEVICE_PACKAGES += fitblk
 endef
 
@@ -173,6 +172,7 @@ define Device/nokia_xg-040g-md
   $(call Device/nokia_xg-040g-md-common)
   DEVICE_DTS := an7581-nokia_xg-040g-md
   DEVICE_DTS_CONFIG := config@1
+  SUPPORTED_DEVICES += nokia,xg-040g-md
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
   IMAGE_SIZE := 261120k
@@ -184,7 +184,7 @@ define Device/nokia_xg-040g-md-tcboot
   $(call Device/nokia_xg-040g-md-common)
   DEVICE_VARIANT := (tcboot)
   DEVICE_DTS := an7581-nokia_xg-040g-md-tcboot
-  SUPPORTED_DEVICES += bell,xg-040g-md
+  SUPPORTED_DEVICES += nokia,xg-040g-md-tcboot
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
   IMAGE_SIZE := 261120k
@@ -231,6 +231,7 @@ define Device/nokia_xg-040g-tf
   $(call Device/nokia_xg-040g-tf-common)
   DEVICE_DTS := an7581-nokia_xg-040g-tf
   DEVICE_DTS_CONFIG := config@1
+  SUPPORTED_DEVICES += nokia,xg-040g-tf
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
   IMAGE_SIZE := 261120k
