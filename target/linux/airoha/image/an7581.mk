@@ -149,10 +149,24 @@ define Device/nokia_xg-040g-md-common
   BLOCKSIZE := 128k
   PAGESIZE := 2048
   UBINIZE_OPTS := -E 5
-  KERNEL := kernel-bin | gzip
   DEVICE_PACKAGES := kmod-gpio-button-hotplug kmod-leds-gpio \
 	kmod-phy-airoha-en8811h kmod-regulator-userspace-consumer \
 	kmod-usb-ledtrig-usbport kmod-usb3
+endef
+
+define Device/nokia_xg-040g-md-images
+  UBOOTENV_IN_UBI := 1
+  KERNEL_IN_UBI := 1
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(DEVICE_DTS).dtb with-initrd | pad-to 128k
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+  IMAGES := sysupgrade.itb sysupgrade.bin
+  IMAGE/sysupgrade.itb := append-kernel | \
+	fit gzip $$(KDIR)/image-$$(DEVICE_DTS).dtb external-static-with-rootfs | \
+	append-metadata
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_PACKAGES += fitblk
 endef
 
 define Device/nokia_xg-040g-md
@@ -162,17 +176,7 @@ define Device/nokia_xg-040g-md
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
   IMAGE_SIZE := 261120k
-  KERNEL_SIZE := 8192k
-  KERNEL_INITRAMFS := kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 128k
-  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
-  IMAGES += factory-kernel.bin factory-rootfs.bin sysupgrade.itb
-  IMAGE/factory-kernel.bin := append-kernel
-  IMAGE/factory-rootfs.bin := append-ubi | check-size
-  IMAGE/sysupgrade.itb := append-kernel | \
-	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
-	append-metadata
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  $(call Device/nokia_xg-040g-md-images)
 endef
 TARGET_DEVICES += nokia_xg-040g-md
 
@@ -183,19 +187,9 @@ define Device/nokia_xg-040g-md-tcboot
   SUPPORTED_DEVICES += bell,xg-040g-md
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
-  KERNEL_SIZE := 8192k
   IMAGE_SIZE := 261120k
-  KERNEL_IN_UBI := 1
   UBINIZE_OPTS := -s 2048
-  KERNEL_INITRAMFS := kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 128k
-  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
-  IMAGES := factory.bin sysupgrade.bin sysupgrade.itb
-  IMAGE/factory.bin := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  IMAGE/sysupgrade.itb := append-kernel | \
-	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
-	append-metadata
+  $(call Device/nokia_xg-040g-md-images)
   DEVICE_PACKAGES += airoha-en7581-npu-firmware kmod-i2c-an7581 \
 	uboot-envtools ubi-utils
 endef
@@ -240,17 +234,7 @@ define Device/nokia_xg-040g-tf
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
   IMAGE_SIZE := 261120k
-  KERNEL_SIZE := 8192k
-  KERNEL_INITRAMFS := kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 128k
-  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
-  IMAGES += factory-kernel.bin factory-rootfs.bin sysupgrade.itb
-  IMAGE/factory-kernel.bin := append-kernel
-  IMAGE/factory-rootfs.bin := append-ubi | check-size
-  IMAGE/sysupgrade.itb := append-kernel | \
-	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
-	append-metadata
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  $(call Device/nokia_xg-040g-md-images)
 endef
 TARGET_DEVICES += nokia_xg-040g-tf
 
