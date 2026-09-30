@@ -168,18 +168,6 @@ define Device/nokia_xg-040g-md-images
   DEVICE_PACKAGES += fitblk
 endef
 
-define Device/nokia_xg-040g-md
-  $(call Device/nokia_xg-040g-md-common)
-  DEVICE_DTS := an7581-nokia_xg-040g-md
-  DEVICE_DTS_CONFIG := config@1
-  SUPPORTED_DEVICES += nokia,xg-040g-md
-  SOC := an7581
-  KERNEL_LOADADDR := 0x80088000
-  IMAGE_SIZE := 261120k
-  $(call Device/nokia_xg-040g-md-images)
-endef
-TARGET_DEVICES += nokia_xg-040g-md
-
 define Device/nokia_xg-040g-md-tcboot
   $(call Device/nokia_xg-040g-md-common)
   DEVICE_VARIANT := (tcboot)
@@ -203,17 +191,7 @@ define Device/nokia_xg-040g-md-ubi
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
   UBINIZE_OPTS := -s 2048
-  UBOOTENV_IN_UBI := 1
-  KERNEL_IN_UBI := 1
-  KERNEL := kernel-bin | gzip
-  KERNEL_INITRAMFS := kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 128k
-  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
-  IMAGES := sysupgrade.itb
-  IMAGE/sysupgrade.itb := append-kernel | \
-	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
-	append-metadata
-  DEVICE_PACKAGES += fitblk
+  $(call Device/nokia_xg-040g-md-images)
   ARTIFACT/bl31-uboot.fip := an7581-bl31-uboot nokia_xg-040g-md
   ARTIFACT/preloader.bin := an7581-preloader nokia_xg-040g-md
   ARTIFACTS := bl31-uboot.fip preloader.bin
@@ -227,18 +205,6 @@ define Device/nokia_xg-040g-tf-common
 	-kmod-usb-ledtrig-usbport -kmod-usb3
 endef
 
-define Device/nokia_xg-040g-tf
-  $(call Device/nokia_xg-040g-tf-common)
-  DEVICE_DTS := an7581-nokia_xg-040g-tf
-  DEVICE_DTS_CONFIG := config@1
-  SUPPORTED_DEVICES += nokia,xg-040g-tf
-  SOC := an7581
-  KERNEL_LOADADDR := 0x80088000
-  IMAGE_SIZE := 261120k
-  $(call Device/nokia_xg-040g-md-images)
-endef
-TARGET_DEVICES += nokia_xg-040g-tf
-
 define Device/nokia_xg-040g-tf-ubi
   $(call Device/nokia_xg-040g-tf-common)
   DEVICE_VARIANT := (UBI)
@@ -247,17 +213,7 @@ define Device/nokia_xg-040g-tf-ubi
   SOC := an7581
   KERNEL_LOADADDR := 0x80088000
   UBINIZE_OPTS := -s 2048
-  UBOOTENV_IN_UBI := 1
-  KERNEL_IN_UBI := 1
-  KERNEL := kernel-bin | gzip
-  KERNEL_INITRAMFS := kernel-bin | lzma | \
-	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 128k
-  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
-  IMAGES := sysupgrade.itb
-  IMAGE/sysupgrade.itb := append-kernel | \
-	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
-	append-metadata
-  DEVICE_PACKAGES += fitblk
+  $(call Device/nokia_xg-040g-md-images)
   ARTIFACT/bl31-uboot.fip := an7581-bl31-uboot nokia_xg-040g-md
   ARTIFACT/preloader.bin := an7581-preloader nokia_xg-040g-md
   ARTIFACTS := bl31-uboot.fip preloader.bin
