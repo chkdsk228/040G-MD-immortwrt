@@ -1,6 +1,6 @@
 <img src="https://avatars.githubusercontent.com/u/53193414?s=200&v=4" alt="logo" width="200" height="200" align="right">
 
-# ImmortalWrt-XG-040G-Enhanced（Nokia XG-040G 系列）
+# ImmortalWrt-XG-040G（Nokia XG-040G 系列）
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/chkdsk228/040G-MD-immortwrt/build-firmware.yml?branch=master&label=Build)](https://github.com/chkdsk228/040G-MD-immortwrt/actions/workflows/build-firmware.yml)
 [![Sync Status](https://img.shields.io/github/actions/workflow/status/chkdsk228/040G-MD-immortwrt/sync-upstream.yml?branch=master&label=Sync)](https://github.com/chkdsk228/040G-MD-immortwrt/actions/workflows/sync-upstream.yml)
@@ -15,23 +15,24 @@
 
 项目继承 naoki66 的稳定构建体系、补丁维护与 CI 流程，并针对 XG-040G 系列进行了设备适配、PON 支持与双 WAN 定制。
 
-当前维护一个相互隔离的硬件配置（`040g.config`），启用以下设备：
+当前维护一个相互隔离的硬件配置（`040g.config`），启用以下 **UBI 布局**设备：
 
-- **XG-040G-MD**：标准 NAND 布局版
-- **XG-040G-MD (UBI)**：UBI 布局版
-- **XG-040G-MD (TCBOOT)**：tcboot U-Boot 引导版
-- **XG-040G-TF**：标准 NAND 布局版
+- **XG-040G-MD (UBI)**：整盘 UBI 布局版
 - **XG-040G-TF (UBI)**：TF 面板版（设备树借用于 ponwrt）
+- **XG-040G-MD (TCBOOT)**：tcboot U-Boot 引导版（256MB UBI）
+
+> [!IMPORTANT]
+> 项目**只维护 UBI 布局**的 XG-040G 固件。早期曾包含 `nokia_xg-040g-md` / `nokia_xg-040g-tf` 标准 NAND
+> 独立分区版（stock-parts 布局），经核实该布局与真实硬件（tcboot U-Boot + `ubi.mtd=ubi`）不符，且上游
+> （ponwrt / naoki66 / bingoguo93）从未编译验证过标准 NAND 版，已从本仓库移除。请使用 UBI 版固件。
 
 ## 支持设备
 
 | 设备 | 构建配置 | 当前定位 | 设备树/镜像 |
 |------|----------|----------|------------|
-| Nokia XG-040G-MD（标准 NAND） | [`040g.config`](040g.config) | 标准固件 | [`an7581-nokia_xg-040g-md.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-md.dts) |
 | Nokia XG-040G-MD（OpenWrt U-Boot UBI 布局） | [`040g.config`](040g.config) | 整盘 UBI 引导方案 | [`an7581-nokia_xg-040g-md-ubi.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-md-ubi.dts) |
-| Nokia XG-040G-MD（tcboot U-Boot） | [`040g.config`](040g.config) | tcboot 引导（256MB UBI） | [`an7581-nokia_xg-040g-md-tcboot.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-md-tcboot.dts) |
-| Nokia XG-040G-TF（标准 NAND） | [`040g.config`](040g.config) | TF 面板标准版 | [`an7581-nokia_xg-040g-tf.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-tf.dts) |
 | Nokia XG-040G-TF（UBI 布局，TF 面板） | [`040g.config`](040g.config) | TF 面板 UBI 版（借用于 [pbs05/ponwrt](https://github.com/pbs05/ponwrt)） | [`an7581-nokia_xg-040g-tf-ubi.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-tf-ubi.dts) |
+| Nokia XG-040G-MD（tcboot U-Boot） | [`040g.config`](040g.config) | tcboot 引导（256MB UBI） | [`an7581-nokia_xg-040g-md-tcboot.dts`](target/linux/airoha/dts/an7581-nokia_xg-040g-md-tcboot.dts) |
 
 ### XG-040G-MD
 
@@ -49,17 +50,18 @@
 ### 核心定制
 
 - 基于 [naoki66/ImmortalWrt-for-Gemtek-brightspeed](https://github.com/naoki66/ImmortalWrt-for-Gemtek-brightspeed) 的设备树与内核补丁体系（`target/linux/airoha/patches-6.18/`）。
-- 启用 Nokia XG-040G-MD / MD-UBI / MD-TCBOOT / TF / TF-UBI 五个设备 profile（`040g.config` 使用 multi-profile 一次构建多份固件）。
-- **tcboot 支持**：`nokia_xg-040g-md-tcboot` profile（256MB UBI 布局 + `ubi.mtd=ubi` bootargs），适配 tcboot U-Boot 引导。
-- TF 面板设备树 `an7581-nokia_xg-040g-tf-*.dts*` 借用于 [pbs05/ponwrt](https://github.com/pbs05/ponwrt)。
-- PON 支持：`CONFIG_AIROHA_PON_COMPAT=y`，驱动与用户态来自 [pbs05/openwrt-pon-drivers](https://github.com/pbs05/openwrt-pon-drivers) 与 [pbs05/openwrt-pon-userspace](https://github.com/pbs05/openwrt-pon-userspace)（`kmod-airoha-en7572`、`kmod-airoha-pon-frontend`、`kmod-airoha-xpon`、`kmod-airoha-tod`、`kmod-airoha-en7581-pcm-spi`、`airoha-ponctl`、`airoha-pond`、`luci-app-pon`）。
+- 启用 Nokia XG-040G-MD-UBI / MD-TCBOOT / TF-UBI 三个 **UBI 布局**设备 profile（`040g.config` 使用 multi-profile 一次构建多份固件）。
+- **tcboot 支持**：`nokia_xg-040g-md-tcboot` profile（256MB UBI 布局 + `ubi.mtd=ubi` bootargs + `chosen/rootdisk = <&ubi_fit>` 供 fitblk 定位 FIT 卷），适配 tcboot U-Boot 引导。
+- TF 面板设备树 `an7581-nokia_xg-040g-tf-ubi.dts` 借用于 [pbs05/ponwrt](https://github.com/pbs05/ponwrt)。
+- **镜像布局（对齐 ponwrt）**：三个设备统一使用 `Device/nokia_xg-040g-md-images` 配方——`KERNEL=kernel-bin|gzip`、独立 `-recovery.itb`（initramfs）、`sysupgrade.itb`（FIT：内核 + external rootfs + metadata）。不再使用固定 8MB kernel 分区 / factory 独立镜像（该设计与 initramfs 内核尺寸冲突且上游未验证）。
+- **PON 支持**（对齐 [bingoguo93/OpenWRT-CI-XG-040G-MD](https://github.com/bingoguo93/OpenWRT-CI-XG-040G-MD) 配置）：驱动与用户态来自 [pbs05/openwrt-pon-drivers](https://github.com/pbs05/openwrt-pon-drivers) 与 [pbs05/openwrt-pon-userspace](https://github.com/pbs05/openwrt-pon-userspace)（`kmod-airoha-en7572`(=m)、`kmod-airoha-xpon`(=y)、`kmod-airoha-pon-frontend`(=y)、`kmod-airoha-paged-bosa`(=m)、`kmod-airoha-tod`、`kmod-airoha-en7581-pcm-spi`、`airoha-ponctl`、`airoha-pond`、`luci-app-pon`）。
 - CPUFreq/PM 域：`CONFIG_KERNEL_ARM_AIROHA_SOC_CPUFREQ`、`CONFIG_KERNEL_AIROHA_CPU_PM_DOMAIN`、`CONFIG_KERNEL_CPUFREQ_DT`。
 - 内核配置导出：`CONFIG_KERNEL_IKCONFIG` / `_PROC`。
-- **NPU 修复**（基于 [xiangtailiang NPU 固件加载修复](https://github.com/xiangtailiang/OpenWrt-for-XG-040G-MD/blob/main/docs/npu-firmware-load.md)）：`NET_AIROHA`/`NET_AIROHA_NPU` 改为内核模块（=m，autoload 40/41），避免早期 probe 读不到固件；DTS `firmware-name` 指向实际固件 `airoha/en7581_MT7996_npu_rv32.bin`。
-- **内核模块包**：`kmod-airoha-npu`、`kmod-airoha-eth`（netdevices.mk 新增）、`kmod-i2c-an7581`（modules.mk 新增）。
-- 固件：`airoha-en7581-npu-firmware`、`airoha-en8811h-firmware`。
-- **USB/存储支持**：`kmod-usb-core/usb2/usb3/usb-xhci-hcd/usb-xhci-mtk`、`kmod-usb-storage`（含 UAS/扩展）、`kmod-scsi-core`、`kmod-ubootenv-nvram`。
-- **文件系统**：`kmod-fs-vfat/exfat/ext4/ntfs3/btrfs` + `e2fsprogs`、`blkid`、`lsblk`。
+- **NPU 固件**：`NET_AIROHA`/`NET_AIROHA_NPU` 以内置（=y）方式编译（保证 out-of-tree xPON 模块链接到 airoha_eth 导出符号）；内核补丁将 NPU 固件缺失的 `-ENOENT` 映射为 `-EPROBE_DEFER` 以允许重试；DTS `firmware-name` 指向实际固件 `airoha/en7581_MT7996_npu_rv32.bin`（参考 [xiangtailiang NPU 修复](https://github.com/xiangtailiang/OpenWrt-for-XG-040G-MD/blob/main/docs/npu-firmware-load.md)）。
+- **内核模块包**：`kmod-i2c-an7581`（modules.mk 新增，`CONFIG_I2C_MT7621`）。
+- 固件：`airoha-en7581-npu-firmware`。
+- **USB/存储支持**：`kmod-usb-core/usb2/usb3/usb-xhci-hcd/usb-xhci-mtk`、`kmod-usb-storage`（含 UAS/扩展）、`kmod-scsi-core`、`kmod-ubootenv-nvram`（对齐 bingoguo93 配置 =m）。
+- **文件系统**：`kmod-fs-vfat/exfat/ext4`、`kmod-nls-base/cp437/utf8`（对齐 bingoguo93 配置 =m）。
 - **MTD 写权限**：`kmod-mtd-rw`（NAND/eMMC 恢复与刷写辅助）。
 
 ### 网络与默认行为
@@ -122,7 +124,7 @@
 | [build-firmware.yml](.github/workflows/build-firmware.yml) | 手动 (workflow_dispatch) | 构建固件并发布 Release |
 | [sync-upstream.yml](.github/workflows/sync-upstream.yml) | 每 3 天定时 + 手动 | 同步 ImmortalWrt 上游 |
 
-**构建配置**：仓库根目录的 [040g.config](040g.config) 对应 XG-040G 系列（默认）。`040g.config` 使用 multi-profile 一次构建 MD / MD-UBI / MD-TCBOOT / TF / TF-UBI 五份固件；Action 默认使用 `040g.config`，也可以在手动触发时选择 `1710.config` 或 `2010.config`（保留 naoki66 原设备）。
+**构建配置**：仓库根目录的 [040g.config](040g.config) 对应 XG-040G 系列（默认）。`040g.config` 使用 multi-profile 一次构建 MD-UBI / MD-TCBOOT / TF-UBI 三份固件；Action 默认使用 `040g.config`，也可以在手动触发时选择 `1710.config` 或 `2010.config`（保留 naoki66 原设备）。
 构建流程会执行 `cp <config> .config && bash scripts/set-build-version.sh .config && make defconfig`。
 
 **Release 格式**：
@@ -135,34 +137,30 @@
 - [Releases 页面](https://github.com/chkdsk228/040G-MD-immortwrt/releases)
 ## 固件文件说明
 
-各设备版本对应的产物文件与升级方式不同，请按下表选择：
+各设备版本对应的产物文件与升级方式如下（**全部为 UBI 布局**，FIT 格式）：
 
 | 设备版本 | 固件文件 | 升级方式 |
 |----------|----------|----------|
-| **XG-040G-MD / XG-040G-TF（标准版）** | `...-nokia_xg-040g-md/tf-*`（含 `sysupgrade.bin`） | **LuCI → 系统 → 备份/升级 → 选择 `sysupgrade.bin` 刷写** |
-| **XG-040G-MD-UBI / XG-040G-TF-UBI（UBI 版）** | `...-nokia_xg-040g-md-ubi/tf-ubi-*`（含 `sysupgrade.itb`、`recovery.itb`） | 详见下方 UBI 版升级说明 |
-| **XG-040G-MD-TCBOOT（tcboot 版）** | `...-nokia_xg-040g-md-tcboot-*`（含 `factory.bin`、`sysupgrade.bin`） | 适配 tcboot U-Boot 引导（`ubi.mtd=ubi` bootargs），详见下方 UBI 版升级说明 |
-
-### 标准版升级
-
-- 文件：`sysupgrade.bin`
-- 方法：**LuCI → 系统 → 备份/升级 → 刷写固件**（常规 OpenWrt 升级流程）
+| **XG-040G-MD-UBI** | `...-nokia_xg-040g-md-ubi-squashfs-sysupgrade.itb`、`...-nokia_xg-040g-md-ubi-initramfs-recovery.itb` | 见下方 UBI 版升级说明 |
+| **XG-040G-TF-UBI** | `...-nokia_xg-040g-tf-ubi-squashfs-sysupgrade.itb`、`...-nokia_xg-040g-tf-ubi-initramfs-recovery.itb` | 见下方 UBI 版升级说明 |
+| **XG-040G-MD-TCBOOT** | `...-nokia_xg-040g-md-tcboot-squashfs-sysupgrade.itb`、`...-nokia_xg-040g-md-tcboot-initramfs-recovery.itb` | 适配 tcboot U-Boot 引导（`ubi.mtd=ubi` bootargs），见下方 UBI 版升级说明 |
 
 ### UBI 版升级
 
-UBI 版采用**整盘 UBI 布局**（`KERNEL_IN_UBI` 与 `UBOOTENV_IN_UBI` 均在 UBI 卷内），**内核与 rootfs 打包为 FIT 格式 `sysupgrade.itb`**，不能直接用标准版的 LuCI sysupgrade.bin 流程：
+UBI 版采用**整盘 UBI 布局**（`KERNEL_IN_UBI` 与 `UBOOTENV_IN_UBI` 均在 UBI 卷内），**内核与 rootfs 打包为 FIT 格式 `sysupgrade.itb`**，不能使用标准版的 LuCI sysupgrade.bin 流程：
 
 - 文件：`sysupgrade.itb`（FIT 格式，含内核 + rootfs）
 - Recovery 镜像：`...-recovery.itb`（initramfs + dtb，U-Boot 应急恢复用）
 - 升级方法（二选一）：
-  1. **LuCI → 系统 → 备份/升级 → 选择 `sysupgrade.itb` 刷写**（FIT 镜像，需要当前系统已是 OpenWrt UBI 布局）
+  1. **LuCI → 系统 → 备份/升级 → 选择 `sysupgrade.itb` 刷写**（FIT 镜像，需要当前系统已是 OpenWrt UBI 布局；`fitblk` 通过 DTB `chosen/rootdisk` 定位 FIT 卷）
   2. **U-Boot HTTP Recovery**：设备进入 U-Boot 的 HTTP 恢复模式后，通过 `luci-app-airoha-recovery` 一键重启进入，再上传 `sysupgrade.itb`
 
 > [!NOTE]
 > UBI 版固件还包含额外的引导产物：`bl31-uboot.fip` 与 `preloader.bin`（位于 Release 附件的 ARTIFACTS 中），用于配套 U-Boot 引导，仅在更换引导程序时需要，常规升级**不要刷写**这两个文件。
 
 > [!NOTE]
-> 固件关键参数：**NAND 256MB**（IMAGE_SIZE=261120k，UBI 分区 `0x100000 → 0xff00000`）、**内核加载地址 0x80088000**、UBINIZE_OPTS 标准版 `-E 5` / UBI·tcboot 版 `-s 2048`。
+> 固件关键参数：**NAND 256MB**、**内核加载地址 0x80088000**、UBINIZE_OPTS `-s 2048`。
+> UBI 分区：MD-UBI / TF-UBI 为 `0x20000 → 0xffe0000`（250MB）；TCBOOT 为 `0x100000 → 0xff00000`（255MB）。
 
 ### 升级注意事项
 
@@ -197,9 +195,12 @@ bash scripts/summarize-build-errors.sh build.log
 - [openwrt/routing](https://github.com/openwrt/routing) - OpenWrt 路由相关包
 
 ### PON 驱动与用户态
-- [pbs05/ponwrt](https://github.com/pbs05/ponwrt) - XG-040G-TF 设备树借用来源
+- [pbs05/ponwrt](https://github.com/pbs05/ponwrt) - XG-040G-TF-UBI 设备树与 UBI 镜像配方（`md-ubi-images`）借用来源
 - [pbs05/openwrt-pon-drivers](https://github.com/pbs05/openwrt-pon-drivers) - PON 内核驱动（`kmod-airoha-en7572`、`kmod-airoha-xpon`）
 - [pbs05/openwrt-pon-userspace](https://github.com/pbs05/openwrt-pon-userspace) - `airoha-ponctl`、`airoha-pond` 和 LuCI PON 用户态
+
+### 配置与构建参考
+- [bingoguo93/OpenWRT-CI-XG-040G-MD](https://github.com/bingoguo93/OpenWRT-CI-XG-040G-MD) - PON/USB/存储配置段对齐参考
 
 ### 性能与增强
 - [Ljzd-PRO/xg040g-openwrt-onekvm](https://github.com/Ljzd-PRO/xg040g-openwrt-onekvm) - 交换性能 LuCI（`luci-app-xg040g-performance`/`xg040g-performance`/`kmod-airoha-an7581-oc`）移植来源
