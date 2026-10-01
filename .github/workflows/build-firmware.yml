@@ -175,6 +175,8 @@ jobs:
             build.log
             build-verbose.log
             bin/targets/airoha/an7581/*.itb
+            bin/targets/airoha/an7581/*.fip
+            bin/targets/airoha/an7581/*preloader.bin
             bin/targets/airoha/an7581/*manifest
             bin/targets/airoha/an7581/config.buildinfo
             bin/targets/airoha/an7581/feeds.buildinfo
@@ -194,9 +196,12 @@ jobs:
             echo ""
             echo "---"
             echo ""
-            echo "如果您觉得对您有帮助，请我喝杯咖啡吧，让我更有动力持续更新。"
+            echo "### 固件说明"
             echo ""
-            echo '<img width="400" height="400" alt="c6ea388c976395326514814f80d512d5" src="https://github.com/user-attachments/assets/0ac90d58-ac73-4dc1-b926-276e539e5d0f" />'
+            echo "- 设备：Nokia XG-040G-MD (UBI) / XG-040G-TF (UBI) / XG-040G-MD (tcboot)"
+            echo "- 升级镜像：*-squashfs-sysupgrade.itb（常规升级）"
+            echo "- 恢复镜像：*-initramfs-recovery.itb（U-Boot 恢复模式）"
+            echo "- 刷写前请备份原厂分区（尤其是 ri 与 bosa），详见 README"
           } > /tmp/release_body.md
           {
             echo "body<<EOF"

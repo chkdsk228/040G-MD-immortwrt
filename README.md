@@ -1,5 +1,3 @@
-<img src="https://avatars.githubusercontent.com/u/53193414?s=200&v=4" alt="logo" width="200" height="200" align="right">
-
 # ImmortalWrt-XG-040G（Nokia XG-040G 系列）
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/chkdsk228/040G-MD-immortwrt/build-firmware.yml?branch=master&label=Build)](https://github.com/chkdsk228/040G-MD-immortwrt/actions/workflows/build-firmware.yml)
@@ -139,11 +137,23 @@
 
 各设备版本对应的产物文件与升级方式如下（**全部为 UBI 布局**，FIT 格式）：
 
+固件文件名格式：
+
+```
+immortalwrt-040g-md-immortwrt-<日期>-<本机commit>-airoha-an7581-<设备>-<镜像>.itb
+```
+
+其中 `<设备>` 为 `nokia_xg-040g-md-ubi` / `nokia_xg-040g-tf-ubi` / `nokia_xg-040g-md-tcboot`；
+`<镜像>` 为 `squashfs-sysupgrade`（常规升级）或 `initramfs-recovery`（U-Boot 恢复模式）。
+
 | 设备版本 | 固件文件 | 升级方式 |
 |----------|----------|----------|
 | **XG-040G-MD-UBI** | `...-nokia_xg-040g-md-ubi-squashfs-sysupgrade.itb`、`...-nokia_xg-040g-md-ubi-initramfs-recovery.itb` | 见下方 UBI 版升级说明 |
 | **XG-040G-TF-UBI** | `...-nokia_xg-040g-tf-ubi-squashfs-sysupgrade.itb`、`...-nokia_xg-040g-tf-ubi-initramfs-recovery.itb` | 见下方 UBI 版升级说明 |
 | **XG-040G-MD-TCBOOT** | `...-nokia_xg-040g-md-tcboot-squashfs-sysupgrade.itb`、`...-nokia_xg-040g-md-tcboot-initramfs-recovery.itb` | 适配 tcboot U-Boot 引导（`ubi.mtd=ubi` bootargs），见下方 UBI 版升级说明 |
+
+> 一次构建产出 3 个设备变体（`040g.config` 的 multi-profile），每个变体包含常规升级镜像与恢复镜像两份 `.itb`，
+> 因此 Release 中会同时出现 6 个固件文件；请按设备型号选择对应文件，不要交叉刷写。
 
 ### UBI 版升级
 
@@ -156,7 +166,7 @@ UBI 版采用**整盘 UBI 布局**（`KERNEL_IN_UBI` 与 `UBOOTENV_IN_UBI` 均�
   2. **U-Boot HTTP Recovery**：设备进入 U-Boot 的 HTTP 恢复模式后，通过 `luci-app-airoha-recovery` 一键重启进入，再上传 `sysupgrade.itb`
 
 > [!NOTE]
-> UBI 版固件还包含额外的引导产物：`bl31-uboot.fip` 与 `preloader.bin`（位于 Release 附件的 ARTIFACTS 中），用于配套 U-Boot 引导，仅在更换引导程序时需要，常规升级**不要刷写**这两个文件。
+> 构建同时会生成配套 U-Boot 引导产物 `bl31-uboot.fip` 与 `preloader.bin`（仅 UBI 变体）。它们**不随 Release 分发**，而是打包在 Actions artifact 中；仅在更换引导程序时需要，常规升级**不要刷写**。
 
 > [!NOTE]
 > 固件关键参数：**NAND 256MB**、**内核加载地址 0x80088000**、UBINIZE_OPTS `-s 2048`。
